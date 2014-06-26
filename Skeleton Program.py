@@ -7,7 +7,6 @@ import random
 import datetime
 NO_OF_RECENT_SCORES = 10
 
-import pickle
 
 class TCard():
   def __init__(self):
@@ -252,6 +251,9 @@ def GetChoiceFromUser():
     elif Choice in ['n','N','No','no']:
       Choice = 'n'
       Valid = True
+    elif Choice in ['Save', 'save', 'SAVE','S','s']:
+      Choice = 's'
+      Valid = True
     else:
       Valid = False
   return Choice
@@ -355,19 +357,31 @@ def SaveScores(RecentScores):
   print('----Scores Saved!----')
 
 def LoadScores():
+  RecentScores = [None]
   with open("save_scores.txt", mode="r", encoding="utf-8") as my_file:
     for count in range(1, NO_OF_RECENT_SCORES + 1):
       ScoreRecord = TRecentScore()
-      ScoreRecord.Score = RecentScores.readline().rstrip("\n")
-      ScoreRecord.Date = RecentScores.readline().rstrip("\n")
-      ScoreRecord.Name = RecentScores.readline().rstrip("\n")
+      ScoreRecord.Name = my_file.readline().rstrip("\n")
+      ScoreRecord.Score = my_file.readline().rstrip("\n")
+      ScoreRecord.Date = my_file.readline().rstrip("\n")
       RecentScores.append(ScoreRecord)
+  for count in range(1, NO_OF_RECENT_SCORES + 1):
+    RecentScores[count].Score = int(RecentScores[count].Score)
+    
 
   return RecentScores   
 
 
 
-      
+def SaveGameProgress(Deck, NoOfCardsTurnedOver):
+  with open("deck2.txt", mode="w", encoding="utf-8") as deck2:
+    for each in Deck:
+      deck2.write(str(Deck)+'\n')
+  with open("score.txt", mode = "w", encoding="utf=8") as score:
+    score.write(str(NoOfCardsTurnedOver))
+  print('Progress Saved!')  
+  
+  
     
 
       
@@ -404,8 +418,11 @@ def PlayGame(Deck, RecentScores, SameScoreEndsGame):
         DisplayCorrectGuessMessage(NoOfCardsTurnedOver - 1)
         LastCard.Rank = NextCard.Rank
         LastCard.Suit = NextCard.Suit
+
       else:
         GameOver = True
+    elif Choice == 's':
+      SaveGameProgress(Deck, NoOfCardsTurnedOver)    
     else:
       GameOver = True
   if GameOver:
